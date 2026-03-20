@@ -9,10 +9,13 @@
 /**
  * Import the modules used in this configuration.
  */
-const GPIO    = scripting.addModule("/ti/driverlib/GPIO", {}, false);
-const GPIO1   = GPIO.addInstance();
-const SYSCTL  = scripting.addModule("/ti/driverlib/SYSCTL");
-const SYSTICK = scripting.addModule("/ti/driverlib/SYSTICK");
+const GPIO          = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1         = GPIO.addInstance();
+const GPIO2         = GPIO.addInstance();
+const GPIO3         = GPIO.addInstance();
+const SYSCTL        = scripting.addModule("/ti/driverlib/SYSCTL");
+const SYSTICK       = scripting.addModule("/ti/driverlib/SYSTICK");
+const ProjectConfig = scripting.addModule("/ti/project_config/ProjectConfig");
 
 /**
  * Write custom configuration values to the imported modules.
@@ -44,13 +47,79 @@ pinFunction4.enable       = true;
 pinFunction4.HFCLKMonitor = true;
 pinFunction4.HFXTStartup  = 100;
 
-GPIO1.port                               = "PORTA";
-GPIO1.$name                              = "LED";
-GPIO1.associatedPins[0].internalResistor = "PULL_DOWN";
-GPIO1.associatedPins[0].assignedPin      = "17";
-GPIO1.associatedPins[0].$name            = "MCU";
+GPIO1.$name                          = "OLED";
+GPIO1.port                           = "PORTA";
+GPIO1.associatedPins.create(2);
+GPIO1.associatedPins[0].$name        = "SCL";
+GPIO1.associatedPins[0].initialValue = "SET";
+GPIO1.associatedPins[0].assignedPin  = "15";
+GPIO1.associatedPins[0].ioStructure  = "SD";
+GPIO1.associatedPins[0].pin.$assign  = "PA15";
+GPIO1.associatedPins[1].$name        = "SDA";
+GPIO1.associatedPins[1].initialValue = "SET";
+GPIO1.associatedPins[1].assignedPin  = "25";
+GPIO1.associatedPins[1].ioStructure  = "SD";
+GPIO1.associatedPins[1].pin.$assign  = "PA25";
 
 const Board = scripting.addModule("/ti/driverlib/Board", {}, false);
+
+GPIO2.$name                              = "LS";
+GPIO2.port                               = "PORTB";
+GPIO2.associatedPins.create(8);
+GPIO2.associatedPins[0].$name            = "PIN_0";
+GPIO2.associatedPins[0].direction        = "INPUT";
+GPIO2.associatedPins[0].internalResistor = "PULL_UP";
+GPIO2.associatedPins[0].ioStructure      = "SD";
+GPIO2.associatedPins[0].assignedPin      = "0";
+GPIO2.associatedPins[0].pin.$assign      = "PB0";
+GPIO2.associatedPins[1].$name            = "PIN_1";
+GPIO2.associatedPins[1].direction        = "INPUT";
+GPIO2.associatedPins[1].ioStructure      = "SD";
+GPIO2.associatedPins[1].internalResistor = "PULL_UP";
+GPIO2.associatedPins[1].assignedPin      = "1";
+GPIO2.associatedPins[1].pin.$assign      = "PB1";
+GPIO2.associatedPins[2].$name            = "PIN_2";
+GPIO2.associatedPins[2].direction        = "INPUT";
+GPIO2.associatedPins[2].ioStructure      = "SD";
+GPIO2.associatedPins[2].internalResistor = "PULL_UP";
+GPIO2.associatedPins[2].assignedPin      = "2";
+GPIO2.associatedPins[2].pin.$assign      = "PB2";
+GPIO2.associatedPins[3].$name            = "PIN_3";
+GPIO2.associatedPins[3].direction        = "INPUT";
+GPIO2.associatedPins[3].ioStructure      = "SD";
+GPIO2.associatedPins[3].internalResistor = "PULL_UP";
+GPIO2.associatedPins[3].assignedPin      = "3";
+GPIO2.associatedPins[3].pin.$assign      = "PB3";
+GPIO2.associatedPins[4].$name            = "PIN_4";
+GPIO2.associatedPins[4].direction        = "INPUT";
+GPIO2.associatedPins[4].ioStructure      = "SD";
+GPIO2.associatedPins[4].internalResistor = "PULL_UP";
+GPIO2.associatedPins[4].assignedPin      = "4";
+GPIO2.associatedPins[4].pin.$assign      = "PB4";
+GPIO2.associatedPins[5].$name            = "PIN_5";
+GPIO2.associatedPins[5].direction        = "INPUT";
+GPIO2.associatedPins[5].ioStructure      = "SD";
+GPIO2.associatedPins[5].internalResistor = "PULL_UP";
+GPIO2.associatedPins[5].assignedPin      = "5";
+GPIO2.associatedPins[5].pin.$assign      = "PB5";
+GPIO2.associatedPins[6].$name            = "PIN_6";
+GPIO2.associatedPins[6].direction        = "INPUT";
+GPIO2.associatedPins[6].ioStructure      = "SD";
+GPIO2.associatedPins[6].internalResistor = "PULL_UP";
+GPIO2.associatedPins[6].assignedPin      = "6";
+GPIO2.associatedPins[6].pin.$assign      = "PB6";
+GPIO2.associatedPins[7].$name            = "PIN_7";
+GPIO2.associatedPins[7].direction        = "INPUT";
+GPIO2.associatedPins[7].ioStructure      = "SD";
+GPIO2.associatedPins[7].internalResistor = "PULL_UP";
+GPIO2.associatedPins[7].assignedPin      = "7";
+GPIO2.associatedPins[7].pin.$assign      = "PB7";
+
+GPIO3.$name                         = "KEY";
+GPIO3.port                          = "PORTA";
+GPIO3.associatedPins[0].direction   = "INPUT";
+GPIO3.associatedPins[0].assignedPin = "1";
+GPIO3.associatedPins[0].$name       = "KEY1";
 
 SYSCTL.forceDefaultClkConfig = true;
 SYSCTL.clockTreeEn           = true;
@@ -69,7 +138,7 @@ SYSTICK.period            = 80;
 pinFunction4.peripheral.$suggestSolution           = "SYSCTL";
 pinFunction4.peripheral.hfxInPin.$suggestSolution  = "PA5";
 pinFunction4.peripheral.hfxOutPin.$suggestSolution = "PA6";
-GPIO1.associatedPins[0].pin.$suggestSolution       = "PA17";
 Board.peripheral.$suggestSolution                  = "DEBUGSS";
 Board.peripheral.swclkPin.$suggestSolution         = "PA20";
 Board.peripheral.swdioPin.$suggestSolution         = "PA19";
+GPIO3.associatedPins[0].pin.$suggestSolution       = "PA1";
