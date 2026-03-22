@@ -15,6 +15,7 @@
 #include "delay.h"
 #include "oled.h"
 #include "LS.h"
+#include "motor.h"
 
 #endif
 
