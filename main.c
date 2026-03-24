@@ -7,11 +7,13 @@ int main(void) {
 
 	Motor_Init();
 
+	encoder_init();
+
+
 	while (1) {
 
-		pwmA(500);
-		pwmB(500);
+		encoder_update();
 
-		delay_cycles(800000);
+		delay_cycles(1600000);
 	}
 }

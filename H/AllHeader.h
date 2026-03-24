@@ -16,6 +16,7 @@
 #include "oled.h"
 #include "LS.h"
 #include "motor.h"
+#include "encoder.h"
 
 #endif
 
