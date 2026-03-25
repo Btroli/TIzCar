@@ -17,6 +17,8 @@ void pwmA(int16_t pwm);
 void pwmB(int16_t pwm);
 void Motor_Stop(uint8_t mode);
 
+#define MOTOR(a,b) do { pwmA(a); pwmB(b); } while(0)
+
 
 
 
@@ -33,13 +35,13 @@ void Motor_Stop(uint8_t mode);
  */
 
 static inline void Motor_A_0(void) {
-	DL_GPIO_setPins(PWM_AIN1_PORT, PWM_AIN1_PIN);
-	DL_GPIO_clearPins(PWM_AIN2_PORT, PWM_AIN2_PIN);
+	DL_GPIO_setPins(PWM_AIN2_PORT, PWM_AIN2_PIN);
+	DL_GPIO_clearPins(PWM_AIN1_PORT, PWM_AIN1_PIN);
 }
 
 static inline void Motor_A_1(void) {
-	DL_GPIO_setPins(PWM_AIN2_PORT, PWM_AIN2_PIN);
-	DL_GPIO_clearPins(PWM_AIN1_PORT, PWM_AIN1_PIN);
+	DL_GPIO_setPins(PWM_AIN1_PORT, PWM_AIN1_PIN);
+	DL_GPIO_clearPins(PWM_AIN2_PORT, PWM_AIN2_PIN);
 }
 
 static inline void Motor_A_2(void) {
@@ -53,13 +55,13 @@ static inline void Motor_A_3(void) {
 }
 
 static inline void Motor_B_0(void) {
-	DL_GPIO_setPins(PWM_BIN1_PORT, PWM_BIN1_PIN);
-	DL_GPIO_clearPins(PWM_BIN2_PORT, PWM_BIN2_PIN);
+	DL_GPIO_setPins(PWM_BIN2_PORT, PWM_BIN2_PIN);
+	DL_GPIO_clearPins(PWM_BIN1_PORT, PWM_BIN1_PIN);
 }
 
 static inline void Motor_B_1(void) {
-	DL_GPIO_setPins(PWM_BIN2_PORT, PWM_BIN2_PIN);
-	DL_GPIO_clearPins(PWM_BIN1_PORT, PWM_BIN1_PIN);
+	DL_GPIO_setPins(PWM_BIN1_PORT, PWM_BIN1_PIN);
+	DL_GPIO_clearPins(PWM_BIN2_PORT, PWM_BIN2_PIN);
 }
 
 static inline void Motor_B_2(void) {

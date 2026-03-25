@@ -2,18 +2,17 @@
 #define	__LS_H
 
 #include "AllHeader.h"
-#include <ti/driverlib/dl_gpio.h>
-
-// #define LS_ONE(pinNum)	((DL_GPIO_readPort(LS_PORT) >> (pinNum)) & 1)
-// #define LS_READ		((uint8_t)DL_GPIO_readPort(LS_PORT))
-// 编译问题，无法使用。
 
 extern volatile uint8_t LSread;
 
 #define LS_ONE(pinNum)  ((DL_GPIO_readPins(LS_PORT, (1U << (pinNum))) >> (pinNum)) & 1U)
 #define LS_READ         ((uint8_t)(DL_GPIO_readPins(LS_PORT, 0xFFU) & 0xFFU))
 
-#define LS_update (LSread = LS_READ)
+#if LINE
+#define LS_update do { LSread = LS_READ; } while(0)
+#else
+#define LS_update do { LSread = ~LS_READ; } while(0)
+#endif
 
 /*
     LS: lightsensor 光敏传感器

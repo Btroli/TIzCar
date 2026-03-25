@@ -102,6 +102,7 @@
                                 <listOptionValue value="${COM_TI_MSPM0_SDK_INSTALL_DIR}/source"/>
                                 <listOptionValue value="${PROJECT_ROOT}/H"/>
                             </option>
+                            <option id="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.compilerID.OPT_LEVEL.1732878424" superClass="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.compilerID.OPT_LEVEL" value="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.compilerID.OPT_LEVEL.0" valueType="enumerated"/>
                         </tool>
                     </fileInfo>
                 </configuration>

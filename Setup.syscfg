@@ -149,6 +149,7 @@ GPIO4.associatedPins[0].interruptPriority = "0";
 GPIO4.associatedPins[0].assignedPort      = "PORTA";
 GPIO4.associatedPins[0].$name             = "E1A";
 GPIO4.associatedPins[0].assignedPin       = "12";
+GPIO4.associatedPins[0].interruptEn       = true;
 GPIO4.associatedPins[1].direction         = "INPUT";
 GPIO4.associatedPins[1].assignedPort      = "PORTB";
 GPIO4.associatedPins[1].assignedPin       = "22";
@@ -172,6 +173,7 @@ GPIO5.associatedPins[1].assignedPin       = "31";
 GPIO5.associatedPins[1].polarity          = "RISE";
 GPIO5.associatedPins[1].interruptPriority = "0";
 GPIO5.associatedPins[1].$name             = "E2B";
+GPIO5.associatedPins[1].interruptEn       = true;
 
 PWM1.$name                              = "motorPWM";
 PWM1.pwmMode                            = "EDGE_ALIGN_UP";

@@ -25,31 +25,43 @@ void encoder_update(void) {
 
 // 外部中断处理函数
 void GROUP1_IRQHandler(void) {
-	uint32_t pendingSource = DL_Interrupt_getPendingGroup(DL_INTERRUPT_GROUP_1);
-
-	if (pendingSource & DL_INTERRUPT_GROUP1_IIDX_GPIOB) {
-		uint32_t gpio_status = DL_GPIO_getEnabledInterruptStatus(GPIOB,
-		                       GPIO_ENCODER_L_E1B_PIN);
-
-		if (gpio_status & GPIO_ENCODER_L_E1B_PIN) {
-			if (DL_GPIO_readPins(GPIOA, GPIO_ENCODER_L_E1A_PIN))
-				ECDA_temp++;
-			else
-				ECDA_temp--;
-			DL_GPIO_clearInterruptStatus(GPIOB, GPIO_ENCODER_L_E1B_PIN);
-		}
-	}
-
-	if (pendingSource & DL_INTERRUPT_GROUP1_IIDX_GPIOB) {
-		uint32_t gpio_status = DL_GPIO_getEnabledInterruptStatus(GPIOB,
-		                       GPIO_ENCODER_R_E2A_PIN);
-
-		if (gpio_status & GPIO_ENCODER_R_E2A_PIN) {
-			if (DL_GPIO_readPins(GPIOA, GPIO_ENCODER_R_E2B_PIN))
-				ECDB_temp++;
-			else
-				ECDB_temp--;
-			DL_GPIO_clearInterruptStatus(GPIOB, GPIO_ENCODER_R_E2A_PIN);
-		}
-	}
+    uint32_t pending = DL_Interrupt_getPendingGroup(DL_INTERRUPT_GROUP_1);
+    
+    if (pending & DL_INTERRUPT_GROUP1_IIDX_GPIOB) {
+        uint32_t status = DL_GPIO_getEnabledInterruptStatus(GPIOB,
+                            GPIO_ENCODER_L_E1B_PIN | GPIO_ENCODER_R_E2A_PIN);
+        if (status & GPIO_ENCODER_L_E1B_PIN) {
+            if (DL_GPIO_readPins(GPIOA, GPIO_ENCODER_L_E1A_PIN))
+                ECDA_temp--;
+            else
+                ECDA_temp++;
+            DL_GPIO_clearInterruptStatus(GPIOB, GPIO_ENCODER_L_E1B_PIN);
+        }
+        if (status & GPIO_ENCODER_R_E2A_PIN) {
+            if (DL_GPIO_readPins(GPIOA, GPIO_ENCODER_R_E2B_PIN))
+                ECDB_temp--;
+            else
+                ECDB_temp++;
+            DL_GPIO_clearInterruptStatus(GPIOB, GPIO_ENCODER_R_E2A_PIN);
+        }
+    }
+    
+    if (pending & DL_INTERRUPT_GROUP1_IIDX_GPIOA) {
+        uint32_t status = DL_GPIO_getEnabledInterruptStatus(GPIOA,
+                            GPIO_ENCODER_L_E1A_PIN | GPIO_ENCODER_R_E2B_PIN);
+        if (status & GPIO_ENCODER_L_E1A_PIN) {
+            if (DL_GPIO_readPins(GPIOB, GPIO_ENCODER_L_E1B_PIN))
+                ECDA_temp++;
+            else
+                ECDA_temp--;
+            DL_GPIO_clearInterruptStatus(GPIOA, GPIO_ENCODER_L_E1A_PIN);
+        }
+        if (status & GPIO_ENCODER_R_E2B_PIN) {
+            if (DL_GPIO_readPins(GPIOB, GPIO_ENCODER_R_E2A_PIN))
+                ECDB_temp++;
+            else
+                ECDB_temp--;
+            DL_GPIO_clearInterruptStatus(GPIOA, GPIO_ENCODER_R_E2B_PIN);
+        }
+    }
 }
