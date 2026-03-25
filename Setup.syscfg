@@ -22,7 +22,6 @@ const SYSTICK       = scripting.addModule("/ti/driverlib/SYSTICK");
 const TIMER         = scripting.addModule("/ti/driverlib/TIMER", {}, false);
 const TIMER1        = TIMER.addInstance();
 const TIMER2        = TIMER.addInstance();
-const TIMER3        = TIMER.addInstance();
 const ProjectConfig = scripting.addModule("/ti/project_config/ProjectConfig");
 
 /**
@@ -211,7 +210,7 @@ TIMER1.timerClkPrescale   = 10;
 TIMER1.timerClkDiv        = 8;
 TIMER1.peripheral.$assign = "TIMG8";
 
-TIMER2.$name              = "TIMER_20ms";
+TIMER2.$name              = "PIDloop";
 TIMER2.timerMode          = "PERIODIC";
 TIMER2.timerStartTimer    = true;
 TIMER2.interrupts         = ["ZERO"];
@@ -219,17 +218,7 @@ TIMER2.interruptPriority  = "3";
 TIMER2.timerClkPrescale   = 10;
 TIMER2.timerClkDiv        = 8;
 TIMER2.timerPeriod        = "20 ms";
-TIMER2.peripheral.$assign = "TIMG7";
-
-TIMER3.$name              = "PIDloop";
-TIMER3.timerMode          = "PERIODIC";
-TIMER3.timerStartTimer    = true;
-TIMER3.interrupts         = ["ZERO"];
-TIMER3.interruptPriority  = "3";
-TIMER3.timerClkPrescale   = 10;
-TIMER3.timerClkDiv        = 8;
-TIMER3.timerPeriod        = "30 ms";
-TIMER3.peripheral.$assign = "TIMG6";
+TIMER2.peripheral.$assign = "TIMG6";
 
 /**
  * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future

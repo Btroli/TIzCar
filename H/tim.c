@@ -3,47 +3,65 @@
 volatile uint16_t Stime;
 volatile uint8_t LSread;
 
+#if TIM_10
 void TIMER_10ms_Init(void) {
 	NVIC_ClearPendingIRQ(TIMER_10ms_INST_INT_IRQN);
 	NVIC_EnableIRQ(TIMER_10ms_INST_INT_IRQN);
 	DL_TimerG_startCounter(TIMER_10ms_INST);
 }
+#endif
 
+#if TIM_20
 void TIMER_20ms_Init(void) {
 	NVIC_ClearPendingIRQ(TIMER_20ms_INST_INT_IRQN);
 	NVIC_EnableIRQ(TIMER_20ms_INST_INT_IRQN);
 	DL_TimerG_startCounter(TIMER_20ms_INST);
 }
+#endif
 
+#if TIM_LOOP
 void PIDloop_Init(void) {
 	NVIC_ClearPendingIRQ(PIDloop_INST_INT_IRQN);
 	NVIC_EnableIRQ(PIDloop_INST_INT_IRQN);
 	DL_TimerG_startCounter(PIDloop_INST);
 }
+#endif
 
 void TIM_init(void) {
+#if TIM_10
 	TIMER_10ms_Init();
+#endif
+#if TIM_20
 	TIMER_20ms_Init();
+#endif
+#if TIM_LOOP
 	PIDloop_Init();
+#endif
 }
 
 /*******************************************************/
 
+#if TIM_10
 void TIMER_10ms_INST_IRQHandler(void) {
 	if ( DL_TimerG_getPendingInterrupt(TIMER_10ms_INST) == DL_TIMER_IIDX_ZERO )
 		Stime++;
 }
+#endif
 
+#if TIM_20
 void TIMER_20ms_INST_IRQHandler(void) {
 	if ( DL_TimerG_getPendingInterrupt(TIMER_20ms_INST) == DL_TIMER_IIDX_ZERO ) {
 		encoder_update();
 		LS_update;
 	}
 }
+#endif
 
+#if TIM_LOOP
 void PIDloop_INST_IRQHandler(void) {
 	if ( DL_TimerG_getPendingInterrupt(PIDloop_INST) == DL_TIMER_IIDX_ZERO ) {
 		loop();
 	}
 }
+#endif
 
