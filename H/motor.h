@@ -12,7 +12,7 @@
 #define STBY_1	DL_GPIO_setPins(PWM_STBY_PORT, PWM_STBY_PIN)
 #define STBY_0	DL_GPIO_clearPins(PWM_STBY_PORT, PWM_STBY_PIN)
 
-void Motor_Init(void);
+void Motor_init(void);
 void pwmA(int16_t pwm);
 void pwmB(int16_t pwm);
 void Motor_Stop(uint8_t mode);

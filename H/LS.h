@@ -8,8 +8,12 @@
 // #define LS_READ		((uint8_t)DL_GPIO_readPort(LS_PORT))
 // 编译问题，无法使用。
 
+extern volatile uint8_t LSread;
+
 #define LS_ONE(pinNum)  ((DL_GPIO_readPins(LS_PORT, (1U << (pinNum))) >> (pinNum)) & 1U)
 #define LS_READ         ((uint8_t)(DL_GPIO_readPins(LS_PORT, 0xFFU) & 0xFFU))
+
+#define LS_update (LSread = LS_READ)
 
 /*
     LS: lightsensor 光敏传感器

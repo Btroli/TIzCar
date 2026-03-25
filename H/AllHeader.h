@@ -17,6 +17,17 @@
 #include "LS.h"
 #include "motor.h"
 #include "encoder.h"
+#include "tim.h"
 
 #endif
+
+/*
+ * GLOBAL 全局变量集合
+ *
+ * Stime
+ * ecdA
+ * ecdB
+ * LSread
+ *
+ */
 

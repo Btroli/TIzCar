@@ -1,6 +1,6 @@
 #include "motor.h"
 
-void Motor_Init(void) {
+void Motor_init(void) {
 	STBY_1;
 	DL_TimerA_startCounter(motorPWM_INST);
 }
