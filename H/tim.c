@@ -19,6 +19,14 @@ void TIMER_20ms_Init(void) {
 }
 #endif
 
+#if TIM_OLED
+void TIMER_OLED_Init(void) {
+	NVIC_ClearPendingIRQ(TIMER_OLED_INST_INT_IRQN);
+	NVIC_EnableIRQ(TIMER_OLED_INST_INT_IRQN);
+	DL_TimerG_startCounter(TIMER_OLED_INST);
+}
+#endif
+
 #if TIM_LOOP
 void PIDloop_Init(void) {
 	NVIC_ClearPendingIRQ(PIDloop_INST_INT_IRQN);
@@ -33,6 +41,9 @@ void TIM_init(void) {
 #endif
 #if TIM_20
 	TIMER_20ms_Init();
+#endif
+#if TIM_OLED
+	TIMER_OLED_Init();
 #endif
 #if TIM_LOOP
 	PIDloop_Init();
@@ -54,6 +65,13 @@ void TIMER_20ms_INST_IRQHandler(void) {
 		encoder_update();
 		LS_update;
 	}
+}
+#endif
+
+#if TIM_OLED
+void TIMER_OLED_INST_IRQHandler(void) {
+	if ( DL_TimerG_getPendingInterrupt(TIMER_OLED_INST) == DL_TIMER_IIDX_ZERO )
+		OLED_loop();
 }
 #endif
 
