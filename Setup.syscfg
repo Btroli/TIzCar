@@ -250,7 +250,7 @@ TIMER2.interrupts         = ["ZERO"];
 TIMER2.timerClkDiv        = 8;
 TIMER2.timerClkPrescale   = 100;
 TIMER2.interruptPriority  = "1";
-TIMER2.timerPeriod        = "200 ms";
+TIMER2.timerPeriod        = "20 ms";
 TIMER2.peripheral.$assign = "TIMG6";
 
 TIMER3.$name              = "TIMER_OLED";

@@ -7,6 +7,7 @@ void pid1(void);
 void OLED_loop(void);
 
 void loop_pid1(void);
+void loop_quan(void);
 
 int main(void) {
 	SYSCFG_DL_init();
@@ -29,13 +30,81 @@ int16_t SPDA = 0, SPDB = 0, PA = 0, PB = 0, pre_PA = 0, pre_PB = 0, sum_PA = 0, 
 
 //pid1
 static const int8_t jq[4] = {8, 12, 20, 15};
-volatile float Kp = 4.7, Ki = 0, Kd = 17;
+volatile float Kp = 4, Ki = 0, Kd = 14;
 int8_t Er, pre_Er;
 int16_t sum_Er, G_temp;
 uint8_t GAB = 30;
 
 void loop(void) {
-	loop_pid1();
+	// loop_pid1();
+	loop_quan();
+}
+
+//stop
+uint32_t distance = 0, distance_now = 0, distance_pj = 0;
+uint8_t bian = 0, bian_pre = 0, bian_flag = 1;
+uint8_t quan = 3;
+volatile uint32_t Stime_bian = 0xFFFFFFFF + 1 - 200;	//2^32 - 200
+
+void loop_quan(void) {
+	encoder_update();
+	LS_update;
+
+	if (LSread) {
+		pid1();
+		if (Last_LSread != LSread)
+			Last_LSread = LSread;
+		bian_flag = 1;
+	} else {
+		sum_Er = 0;
+		if (Last_LSread & LEFT) {
+			GA = -35;
+			GB = 15;
+		} else if (Last_LSread & RIGHT) {
+			GA = 15;
+			GB = -35;
+		}
+
+		if (bian_flag && Stime - Stime_bian >= 50) {	//此处防止转弯不稳定
+			bian++;
+			Stime_bian = Stime;
+		}
+		bian_flag = 0;
+	}
+
+	pid0();
+
+	distance_now += (ecdA + ecdB) / 2;
+
+	if (bian != bian_pre) {
+		bian_pre = bian;
+
+		if (bian == 1)
+			distance = distance_now;
+		else if (bian == 4 * quan) {
+			distance_pj += distance_now;
+			distance_pj /= (4 * quan - 1);
+			distance = distance_pj - distance;
+		} else
+			distance_pj += distance_now;
+		distance_now = 0;
+	}
+
+	if (bian == 4 * quan)
+		if (distance_now >= distance) {
+			Motor_Stop(1);
+			while (1);
+			// while (1)
+			// 	if (ReadKEY1) {
+			// 		bian = 0;
+			// 		bian_pre = 0;
+			// 		bian_flag = 1;
+			// 		quan = 8;
+			// 		Stime_bian = 0xFFFFFFFF + 1 - 200;
+			// 		Stime = 0;
+			// 		return;
+			// 	}
+		}
 }
 
 void loop_pid1(void) {
