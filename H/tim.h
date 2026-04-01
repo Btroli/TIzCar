@@ -7,6 +7,7 @@
 #define TIM_20		0
 #define TIM_OLED	1
 #define TIM_LOOP	1
+#define TIM_TRIG	0
 
 extern volatile uint16_t Stime;
 

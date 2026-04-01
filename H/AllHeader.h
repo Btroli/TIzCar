@@ -26,11 +26,12 @@
 #include "motor.h"
 #include "encoder.h"
 #include "tim.h"
+#include "ultrasound.h"
 
 #endif
 
 /*
- * GLOBAL 鍏ㄥ眬鍙橀噺闆嗗悎
+ * GLOBAL 全局变量集合
  *
  * Stime
  * ecdA

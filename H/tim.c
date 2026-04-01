@@ -35,6 +35,14 @@ void PIDloop_Init(void) {
 }
 #endif
 
+#if TIM_TRIG
+void TIMER_TRIG_Init(void) {
+	NVIC_ClearPendingIRQ(TIMER_TRIG_INST_INT_IRQN);
+	NVIC_EnableIRQ(TIMER_TRIG_INST_INT_IRQN);
+	DL_TimerA_startCounter(TIMER_TRIG_INST);
+}
+#endif
+
 void TIM_init(void) {
 #if TIM_10
 	TIMER_10ms_Init();
@@ -47,6 +55,9 @@ void TIM_init(void) {
 #endif
 #if TIM_LOOP
 	PIDloop_Init();
+#endif
+#if TIM_TRIG
+	TIMER_TRIG_Init();
 #endif
 }
 
@@ -80,6 +91,20 @@ void PIDloop_INST_IRQHandler(void) {
 	if ( DL_TimerG_getPendingInterrupt(PIDloop_INST) == DL_TIMER_IIDX_ZERO ) {
 		loop();
 	}
+}
+#endif
+
+#if TIM_TRIG
+void TIMER_TRIG_INST_IRQHandler(void) {
+	if ( DL_TimerA_getPendingInterrupt(TIMER_TRIG_INST) == DL_TIMER_IIDX_ZERO )
+		if (capture_done > 1) {
+			if (capture_done-- == 2) {
+				capture_done = 0;
+				TRIG_LOW;
+				return;
+			}
+			TRIG_HIGH;
+		}
 }
 #endif
 
