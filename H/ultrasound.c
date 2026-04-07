@@ -136,60 +136,92 @@ volatile uint16_t  echotime = 0xFFFF;
 
 int testAAA;
 
+// void CAPTURE_ULTRASOUND_ECHO_INST_IRQHandler(void)
+// {
+//     testAAA++;
+//     /* 
+//      * 1. �����������ж� (������ʼ)
+//      * ��Ӧ SysConfig �е� "Channel 0 compare up event"
+//      */
+//     if (DL_Timer_getRawInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
+//                                        DL_TIMER_INTERRUPT_CC0_UP_EVENT)) 
+//     {
+//         // ����жϱ�־
+//         DL_Timer_clearInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
+//                                       DL_TIMER_INTERRUPT_CC0_UP_EVENT);
+
+//         // �������������ʼ��ʱ
+//         DL_Timer_setTimerCount(CAPTURE_ULTRASOUND_ECHO_INST, 0);
+        
+//         // ������ڼ�ʱ
+//         capture_done = -1; 
+//     }
+
+//     /* 
+//      * 2. �����½����ж� (��������)
+//      * ��Ӧ SysConfig �е� "Channel 0 compare down event"
+//      */
+//     if (DL_Timer_getRawInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
+//                                        DL_TIMER_INTERRUPT_CC0_DN_EVENT)) 
+//     {
+//         // ����жϱ�־
+//         DL_Timer_clearInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
+//                                       DL_TIMER_INTERRUPT_CC0_DN_EVENT);
+
+//         // ��ȡ����ֵ
+//         echotime = DL_Timer_getCaptureCompareValue(CAPTURE_ULTRASOUND_ECHO_INST, DL_TIMER_CC_0_INDEX);
+        
+//         // ��ǲ������
+//         capture_done = 1; 
+//     }
+
+//     /* 
+//      * 3. ��������ж� (��ʱ����)
+//      */
+//     if (DL_Timer_getRawInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
+//                                        DL_TIMER_INTERRUPT_OVERFLOW_EVENT)) 
+//     {
+//         DL_Timer_clearInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
+//                                       DL_TIMER_INTERRUPT_OVERFLOW_EVENT);
+        
+//         if (capture_done == -1) 
+//         {
+//             echotime = 0xFFFF;
+//             capture_done = 1;
+//         }
+//     }
+// }
+
 void CAPTURE_ULTRASOUND_ECHO_INST_IRQHandler(void)
 {
-    testAAA++;
-    /* 
-     * 1. �����������ж� (������ʼ)
-     * ��Ӧ SysConfig �е� "Channel 0 compare up event"
-     */
-    if (DL_Timer_getRawInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
-                                       DL_TIMER_INTERRUPT_CC0_UP_EVENT)) 
+    testAAA++; // 保留这个用于调试
+
+    // 1. 只处理 Capture Up Event (对应上升沿或双边沿触发)
+    if (DL_Timer_getRawInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, DL_TIMER_INTERRUPT_CC0_UP_EVENT))
     {
-        // ����жϱ�־
-        DL_Timer_clearInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
-                                      DL_TIMER_INTERRUPT_CC0_UP_EVENT);
-
-        // �������������ʼ��ʱ
-        DL_Timer_setTimerCount(CAPTURE_ULTRASOUND_ECHO_INST, 0);
+        DL_Timer_clearInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, DL_TIMER_INTERRUPT_CC0_UP_EVENT);
         
-        // ������ڼ�ʱ
-        capture_done = -1; 
-    }
-
-    /* 
-     * 2. �����½����ж� (��������)
-     * ��Ӧ SysConfig �е� "Channel 0 compare down event"
-     */
-    if (DL_Timer_getRawInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
-                                       DL_TIMER_INTERRUPT_CC0_DN_EVENT)) 
-    {
-        // ����жϱ�־
-        DL_Timer_clearInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
-                                      DL_TIMER_INTERRUPT_CC0_DN_EVENT);
-
-        // ��ȡ����ֵ
-        echotime = DL_Timer_getCaptureCompareValue(CAPTURE_ULTRASOUND_ECHO_INST, DL_TIMER_CC_0_INDEX);
+        // 读取捕获值
+        uint16_t currentCount = DL_Timer_getCaptureCompareValue(CAPTURE_ULTRASOUND_ECHO_INST, DL_TIMER_CC_0_INDEX);
         
-        // ��ǲ������
-        capture_done = 1; 
-    }
-
-    /* 
-     * 3. ��������ж� (��ʱ����)
-     */
-    if (DL_Timer_getRawInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
-                                       DL_TIMER_INTERRUPT_OVERFLOW_EVENT)) 
-    {
-        DL_Timer_clearInterruptStatus(CAPTURE_ULTRASOUND_ECHO_INST, 
-                                      DL_TIMER_INTERRUPT_OVERFLOW_EVENT);
-        
-        if (capture_done == -1) 
+        // 2. 判断状态机
+        if (capture_done == 0) 
         {
-            echotime = 0xFFFF;
-            capture_done = 1;
+            // 状态0: 等待测量开始 (此时应该是高电平到来)
+            // 记录起始时间或直接清零计数器
+            DL_Timer_setTimerCount(CAPTURE_ULTRASOUND_ECHO_INST, 0); 
+            capture_done = -1; // 进入计时状态
+        }
+        else if (capture_done == -1) 
+        {
+            // 状态-1: 捕获到了结束边沿 (下降沿)
+            echotime = currentCount; // 直接保存计数值
+            capture_done = 1;        // 测量完成！
+            // 注意：这里不再去修改硬件的边沿检测模式
         }
     }
+    
+    // 删除溢出处理部分
 }
 
 float ultrasound_distance(void) {

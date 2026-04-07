@@ -12,6 +12,9 @@ void loop_quan(void);
 int main(void) {
 	SYSCFG_DL_init();
 
+	NVIC_ClearPendingIRQ(CAPTURE_ULTRASOUND_ECHO_INST_INT_IRQN);
+	NVIC_EnableIRQ(CAPTURE_ULTRASOUND_ECHO_INST_INT_IRQN);
+
 	OLED_SET();
 	Motor_init();
 	encoder_init();
@@ -37,7 +40,8 @@ uint8_t GAB = 30;
 
 void loop(void) {
 	// loop_pid1();
-	loop_quan();
+	// loop_quan();
+	CSB;
 }
 
 //stop
@@ -168,21 +172,21 @@ void pid1(void) {
 }
 
 void OLED_loop(void) {
-	OLED_ShowString(0, 0, "SPDA", 8, 1);
-	OLED_ShowNumNoLen(0, 8, SPDA, 8, 1);
-	OLED_ShowNumNoLen(0, 8 + 8 + 5, GA, 16, 1);
-	OLED_ShowNumNoLen(0, 8 + 8 + 5 + 16 + 3, ecdA, 16, 1);
-	OLED_ShowString(0, 8 + 8, "GA", 8, 1);
-	OLED_ShowString(0, 8 + 8 + 5 + 14, "ecdA", 8, 1);
+	// OLED_ShowString(0, 0, "SPDA", 8, 1);
+	// OLED_ShowNumNoLen(0, 8, SPDA, 8, 1);
+	// OLED_ShowNumNoLen(0, 8 + 8 + 5, GA, 16, 1);
+	// OLED_ShowNumNoLen(0, 8 + 8 + 5 + 16 + 3, ecdA, 16, 1);
+	// OLED_ShowString(0, 8 + 8, "GA", 8, 1);
+	// OLED_ShowString(0, 8 + 8 + 5 + 14, "ecdA", 8, 1);
 
-	OLED_ShowString(63, 0, "SPDB", 8, 1);
-	OLED_ShowNumNoLen(63, 8, SPDB, 8, 1);
-	OLED_ShowNumNoLen(63, 8 + 8 + 5, GB, 16, 1);
-	OLED_ShowNumNoLen(63, 8 + 8 + 5 + 16 + 3, ecdB, 16, 1);
-	OLED_ShowString(63, 8 + 8, "GB", 8, 1);
-	OLED_ShowString(63, 8 + 8 + 5 + 14, "ecdB", 8, 1);
+	// OLED_ShowString(63, 0, "SPDB", 8, 1);
+	// OLED_ShowNumNoLen(63, 8, SPDB, 8, 1);
+	// OLED_ShowNumNoLen(63, 8 + 8 + 5, GB, 16, 1);
+	// OLED_ShowNumNoLen(63, 8 + 8 + 5 + 16 + 3, ecdB, 16, 1);
+	// OLED_ShowString(63, 8 + 8, "GB", 8, 1);
+	// OLED_ShowString(63, 8 + 8 + 5 + 14, "ecdB", 8, 1);
 
-	// OLED_ShowNumNoLen(0, 8 + 8 + 5, ultrasound_distance(), 16, 1);
+	OLED_ShowNumNoLen(0, 8 + 8 + 5, ultrasound_distance(), 16, 1);
 
 	OLED_Refresh();
 	OLED_ClearRF();

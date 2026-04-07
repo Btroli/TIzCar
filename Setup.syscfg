@@ -60,21 +60,23 @@ pinFunction4.HFCLKMonitor = true;
 pinFunction4.HFXTStartup  = 100;
 
 CAPTURE1.$name                              = "CAPTURE_ULTRASOUND_ECHO";
-CAPTURE1.timerClkPrescale                   = 40;
-CAPTURE1.interruptPriority                  = "1";
-CAPTURE1.timerPeriod                        = "65535 us";
 CAPTURE1.captMode                           = "EDGE_TIME_UP";
-CAPTURE1.interrupts                         = ["CC0_DN","CC0_UP","OVERFLOW"];
 CAPTURE1.timerStartTimer                    = true;
+CAPTURE1.timerPeriod                        = "65535 us";
+CAPTURE1.interruptPriority                  = "0";
+CAPTURE1.timerClkPrescale                   = 80;
+CAPTURE1.ccIndexMulti                       = [0];
+CAPTURE1.multi_ch0_captEdgeDetection        = "DL_TIMER_CC_CCOND_TRIG_EDGE";
+CAPTURE1.multi_countMode                    = "DL_TIMER_COUNT_MODE_UP";
+CAPTURE1.interrupts                         = ["CC0_UP"];
 CAPTURE1.captEdgeDetection                  = "EDGE";
-CAPTURE1.peripheral.$assign                 = "TIMG0";
-CAPTURE1.peripheral.ccp0Pin.$assign         = "PA23";
+CAPTURE1.peripheral.$assign                 = "TIMG7";
 CAPTURE1.ccp0PinConfig.hideOutputInversion  = scripting.forceWrite(false);
 CAPTURE1.ccp0PinConfig.onlyInternalResistor = scripting.forceWrite(false);
 CAPTURE1.ccp0PinConfig.passedPeripheralType = scripting.forceWrite("Digital");
 CAPTURE1.ccp0PinConfig.$name                = "ti_driverlib_gpio_GPIOPinGeneric2";
 CAPTURE1.ccp0PinConfig.enableConfig         = true;
-CAPTURE1.ccp0PinConfig.internalResistor     = "PULL_DOWN";
+CAPTURE1.ccp0PinConfig.internalResistor     = "PULL_UP";
 
 const Board = scripting.addModule("/ti/driverlib/Board", {}, false);
 
@@ -250,7 +252,7 @@ TIMER2.interrupts         = ["ZERO"];
 TIMER2.timerClkDiv        = 8;
 TIMER2.timerClkPrescale   = 100;
 TIMER2.interruptPriority  = "1";
-TIMER2.timerPeriod        = "20 ms";
+TIMER2.timerPeriod        = "200 ms";
 TIMER2.peripheral.$assign = "TIMG6";
 
 TIMER3.$name              = "TIMER_OLED";
@@ -279,6 +281,7 @@ TIMER4.peripheral.$assign = "TIMA1";
 pinFunction4.peripheral.$suggestSolution           = "SYSCTL";
 pinFunction4.peripheral.hfxInPin.$suggestSolution  = "PA5";
 pinFunction4.peripheral.hfxOutPin.$suggestSolution = "PA6";
+CAPTURE1.peripheral.ccp0Pin.$suggestSolution       = "PA17";
 Board.peripheral.$suggestSolution                  = "DEBUGSS";
 Board.peripheral.swclkPin.$suggestSolution         = "PA20";
 Board.peripheral.swdioPin.$suggestSolution         = "PA19";
