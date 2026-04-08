@@ -8,17 +8,16 @@ void OLED_loop(void);
 
 void loop_pid1(void);
 void loop_quan(void);
+void loop_bz(void);
 
 int main(void) {
 	SYSCFG_DL_init();
-
-	NVIC_ClearPendingIRQ(CAPTURE_ULTRASOUND_ECHO_INST_INT_IRQN);
-	NVIC_EnableIRQ(CAPTURE_ULTRASOUND_ECHO_INST_INT_IRQN);
 
 	OLED_SET();
 	Motor_init();
 	encoder_init();
 	TIM_init();
+	Ultrasound_init();
 
 	while (1);
 }
@@ -33,15 +32,73 @@ int16_t SPDA = 0, SPDB = 0, PA = 0, PB = 0, pre_PA = 0, pre_PB = 0, sum_PA = 0, 
 
 //pid1
 static const int8_t jq[4] = {8, 12, 20, 15};
-volatile float Kp = 4, Ki = 0, Kd = 14;
+volatile float Kp = 6.5, Ki = 0, Kd = 22;
 int8_t Er, pre_Er;
 int16_t sum_Er, G_temp;
 uint8_t GAB = 30;
 
 void loop(void) {
-	// loop_pid1();
+	loop_pid1();
 	// loop_quan();
-	CSB;
+	// loop_bz();
+}
+
+int8_t bz_mode = 0, bz_turn;
+
+void loop_bz(void) {
+	encoder_update();
+	LS_update;
+
+	if (bz_mode) {
+		sum_Er = 0;
+		// if (bz_mode > 28) {
+		// 		bz_mode--;
+		// 		GA = -60;
+		// 		GB = -60;
+		// }
+		if (bz_mode > 10) {
+			bz_mode--;
+			if (bz_turn == -1) {
+				GA = 10;
+				GB = 50;
+			} else if (bz_turn == 1) {
+				GA = 50;
+				GB = 10;
+			}
+		} else {
+			if (bz_turn == -1) {
+				GA = 32;
+				GB = 18;
+			} else if (bz_turn == 1) {
+				GA = 18;
+				GB = 32;
+			}
+
+			if (LSread)
+				bz_mode = 0;
+		}
+	} else {
+		if (LSread) {
+			pid1();
+			if (Last_LSread != LSread)
+				Last_LSread = LSread;
+			if (echotime < 1800)
+				bz_mode = 28;
+		} else {
+			sum_Er = 0;
+			if (Last_LSread & LEFT) {
+				GA = -35;
+				GB = 15;
+				bz_turn = -1;	//左转
+			} else if (Last_LSread & RIGHT) {
+				GA = 15;
+				GB = -35;
+				bz_turn = 1;
+			}
+		}
+	}
+
+	pid0();
 }
 
 //stop

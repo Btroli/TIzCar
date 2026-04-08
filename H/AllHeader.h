@@ -31,7 +31,7 @@
 #endif
 
 /*
- * GLOBAL 全局变量集合
+ * GLOBAL 鍏ㄥ眬鍙橀噺闆嗗悎
  *
  * Stime
  * ecdA
