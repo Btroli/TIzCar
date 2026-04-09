@@ -4,7 +4,8 @@
 u8 OLED_GRAM[144][8];
 
 void IIC_delay(void) {
-	delay_us(3);
+//	delay_us(2);
+	delay_cycles(120);
 }
 
 //起始信号
@@ -710,7 +711,7 @@ void OLED_SET(void) {
 	OLED_WR_Byte(0xad, OLED_CMD); /*set charge pump enable*/
 	OLED_WR_Byte(0x8b, OLED_CMD); /* 0x8B 内供 VCC */
 	OLED_WR_Byte(0x33, OLED_CMD); /*0X30---0X33 set VPP 9V */
-	OLED_WR_Byte(0xC8, OLED_CMD); /*Com scan direction*/
+	OLED_WR_Byte(0xC0, OLED_CMD); /*Com scan direction*/
 	OLED_WR_Byte(0xD3, OLED_CMD); /*set display offset*/
 	OLED_WR_Byte(0x00, OLED_CMD); /* 0x20 */
 	OLED_WR_Byte(0xD5, OLED_CMD); /*set osc division*/

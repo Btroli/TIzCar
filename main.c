@@ -14,6 +14,8 @@ int main(void) {
 	SYSCFG_DL_init();
 
 	OLED_SET();
+	OLED_DisplayTurn(1);
+
 	Motor_init();
 	encoder_init();
 	TIM_init();
@@ -38,7 +40,7 @@ int16_t sum_Er, G_temp;
 uint8_t GAB = 30;
 
 void loop(void) {
-	loop_pid1();
+	// loop_pid1();
 	// loop_quan();
 	// loop_bz();
 }
@@ -228,23 +230,67 @@ void pid1(void) {
 	GB = (-20 < GB && GB < 70) ? GB : ((GB < 0) ? -20 : 70);
 }
 
+//#define selNUM 10
+#define selNUM 4 
+
+int8_t b01=0,k3[2]={0,0},oled_mode;
+const char* value_name[selNUM]={"test0","test1","test2","test3","test4","test5","test6","test7","test8","test9"};
+/*
+ * k3 -> 0 ：选择第几个
+ * k3 -> 1 ：虚线框的位置
+ */
+
+void oled_sel0(void){
+	for (uint8_t i=0;i<3;i++){
+		OLED_DrawBoxLine(0,22*i,127,19+22*i,1);
+		if (i==k3[1])
+			OLED_DrawBoxXuLine(0,22*i,127,19+22*i,2,b01);
+
+		OLED_ShowString(2,1+22*i,(char*)value_name[k3[0]-k3[1]+i],16,1);
+	}
+
+	if (!ReadKEY1){
+		k3[0]++;
+		k3[1]++;
+		if (k3[1]==3){
+			k3[1]=2;
+			if (k3[0]==selNUM)
+				k3[0]--;
+		}
+	}
+	if (!ReadKEY2){
+		k3[0]--;
+		k3[1]--;
+		if (k3[1]==-1){
+			k3[1]=0;
+			if (k3[0]==-1)
+				k3[0]++;
+		}
+	}
+	if (!ReadKEY3){
+		oled_mode=1;
+		return;
+	}
+}
+
+//void* sel[selNUM]={&bian,&Kp,&Ki,&Kd};
+
+void oled_sel1(void){
+//	OLED_ShowNumNoLen(6,6,(int32_t)*sel[k3[0]],12,1);
+	if (!ReadKEY4){
+		oled_mode=0;
+		return;
+	}
+}
+
 void OLED_loop(void) {
-	// OLED_ShowString(0, 0, "SPDA", 8, 1);
-	// OLED_ShowNumNoLen(0, 8, SPDA, 8, 1);
-	// OLED_ShowNumNoLen(0, 8 + 8 + 5, GA, 16, 1);
-	// OLED_ShowNumNoLen(0, 8 + 8 + 5 + 16 + 3, ecdA, 16, 1);
-	// OLED_ShowString(0, 8 + 8, "GA", 8, 1);
-	// OLED_ShowString(0, 8 + 8 + 5 + 14, "ecdA", 8, 1);
+	if (oled_mode==0)
+		oled_sel0();
+	else
+		oled_sel1();
 
-	// OLED_ShowString(63, 0, "SPDB", 8, 1);
-	// OLED_ShowNumNoLen(63, 8, SPDB, 8, 1);
-	// OLED_ShowNumNoLen(63, 8 + 8 + 5, GB, 16, 1);
-	// OLED_ShowNumNoLen(63, 8 + 8 + 5 + 16 + 3, ecdB, 16, 1);
-	// OLED_ShowString(63, 8 + 8, "GB", 8, 1);
-	// OLED_ShowString(63, 8 + 8 + 5 + 14, "ecdB", 8, 1);
-
-	OLED_ShowNumNoLen(0, 8 + 8 + 5, ultrasound_distance(), 16, 1);
-
+	/***************************/
+	b01=1-b01;
 	OLED_Refresh();
 	OLED_ClearRF();
 }
