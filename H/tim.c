@@ -83,7 +83,8 @@ void TIMER_20ms_INST_IRQHandler(void) {
 void TIMER_OLED_INST_IRQHandler(void) {
 	if ( DL_TimerG_getPendingInterrupt(TIMER_OLED_INST) == DL_TIMER_IIDX_ZERO ) {
 		OLED_loop();
-		CSB;
+		if (capture_done == 1)
+			CSB;
 	}
 }
 #endif

@@ -34,7 +34,7 @@ int16_t SPDA = 0, SPDB = 0, PA = 0, PB = 0, pre_PA = 0, pre_PB = 0, sum_PA = 0, 
 
 //pid1
 static const int8_t jq[4] = {8, 12, 20, 15};
-volatile float Kp = 6.5, Ki = 0, Kd = 22;
+volatile float Kp = 60, Ki = 2, Kd = 35;
 int8_t Er, pre_Er;
 int16_t sum_Er, G_temp;
 uint8_t GAB = 30;
@@ -46,58 +46,100 @@ void loop(void) {
 }
 
 int8_t bz_mode = 0, bz_turn;
+volatile int16_t bz_time = 0;
+typedef enum {
+	BZ_IDLE = 0,    // 正常循迹
+	BZ_LEFT,        // 左转
+	BZ_FWD,         // 向前开
+	BZ_RIGHT,       // 右转
+	BZ_FWD2         // 向右转后向前开，等待碰线
+} BZ_State;
+volatile BZ_State bz_state = BZ_IDLE;
 
 void loop_bz(void) {
 	encoder_update();
 	LS_update;
 
-	if (bz_mode) {
-		sum_Er = 0;
-		// if (bz_mode > 28) {
-		// 		bz_mode--;
-		// 		GA = -60;
-		// 		GB = -60;
-		// }
-		if (bz_mode > 10) {
-			bz_mode--;
-			if (bz_turn == -1) {
-				GA = 10;
-				GB = 50;
-			} else if (bz_turn == 1) {
-				GA = 50;
-				GB = 10;
-			}
-		} else {
-			if (bz_turn == -1) {
-				GA = 32;
-				GB = 18;
-			} else if (bz_turn == 1) {
-				GA = 18;
-				GB = 32;
-			}
-
-			if (LSread)
-				bz_mode = 0;
+	if (bz_state == BZ_IDLE) {
+		if (ultrasound_distance() < 23) {	//改为23cm
+			STBY_0;
+			bz_time = 0;
+			bz_state = BZ_LEFT;
+			return;
 		}
-	} else {
+
 		if (LSread) {
 			pid1();
 			if (Last_LSread != LSread)
 				Last_LSread = LSread;
-			if (echotime < 1800)
-				bz_mode = 28;
 		} else {
 			sum_Er = 0;
 			if (Last_LSread & LEFT) {
-				GA = -35;
-				GB = 15;
-				bz_turn = -1;	//左转
+				GA = -10;
+				GB = 40;
 			} else if (Last_LSread & RIGHT) {
-				GA = 15;
-				GB = -35;
-				bz_turn = 1;
+				GA = 40;
+				GB = -10;
 			}
 		}
+	}
+
+	if (bz_state != BZ_IDLE) {
+		bz_time++;		//计时+1（约10ms/次）
+
+		switch (bz_state) {
+
+			case BZ_LEFT:
+				STBY_1;
+				GA = -10;
+				GB = 40;
+				if (bz_time >= 15) {		//左转 ≈ 300ms（20ms×15）
+					GA = 40;
+					GB = 40;
+					bz_time = 0;
+					bz_state = BZ_FWD;
+				}
+				break;
+
+			case BZ_FWD:
+				STBY_1;				//确保电机使能
+				GA = 40;			//加大速度，确保能前进
+				GB = 40;
+				if (bz_time >= 40) {		//直行 ≈ 1秒（20ms×50）
+					GA = 40;
+					GB = -10;
+					bz_time = 0;
+					bz_state = BZ_RIGHT;
+					return;
+				}
+				break;
+
+			case BZ_RIGHT:
+
+				GA = 40;
+				GB = -10;
+				if (bz_time >= 32) {		//右转 ≈ 460ms（20ms×23）
+					GA = 40;
+					GB = 40;
+					bz_time = 0;
+					bz_state = BZ_FWD2;
+					return;			//本次loop到此为止
+				}
+				break;
+
+			case BZ_FWD2:
+				GA = 40;
+				GB = 40;
+				if (LSread & 0x3E) {
+					bz_state = BZ_IDLE;
+				}
+				break;
+		}
+
+		SPDA = GA * 10;
+		SPDB = GB * 10;
+		MOTOR(SPDA, SPDB);
+		return;
 	}
 
 	pid0();
@@ -231,66 +273,66 @@ void pid1(void) {
 }
 
 //#define selNUM 10
-#define selNUM 4 
+#define selNUM 4
 
-int8_t b01=0,k3[2]={0,0},oled_mode;
-const char* value_name[selNUM]={"test0","test1","test2","test3","test4","test5","test6","test7","test8","test9"};
+int8_t b01 = 0, k3[2] = {0, 0}, oled_mode;
+const char *value_name[selNUM] = {"test0", "test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8", "test9"};
 /*
  * k3 -> 0 ：选择第几个
  * k3 -> 1 ：虚线框的位置
  */
 
-void oled_sel0(void){
-	for (uint8_t i=0;i<3;i++){
-		OLED_DrawBoxLine(0,22*i,127,19+22*i,1);
-		if (i==k3[1])
-			OLED_DrawBoxXuLine(0,22*i,127,19+22*i,2,b01);
+void oled_sel0(void) {
+	for (uint8_t i = 0; i < 3; i++) {
+		OLED_DrawBoxLine(0, 22 * i, 127, 19 + 22 * i, 1);
+		if (i == k3[1])
+			OLED_DrawBoxXuLine(0, 22 * i, 127, 19 + 22 * i, 2, b01);
 
-		OLED_ShowString(2,1+22*i,(char*)value_name[k3[0]-k3[1]+i],16,1);
+		OLED_ShowString(2, 1 + 22 * i, (char*)value_name[k3[0] - k3[1] + i], 16, 1);
 	}
 
-	if (!ReadKEY1){
+	if (!ReadKEY1) {
 		k3[0]++;
 		k3[1]++;
-		if (k3[1]==3){
-			k3[1]=2;
-			if (k3[0]==selNUM)
+		if (k3[1] == 3) {
+			k3[1] = 2;
+			if (k3[0] == selNUM)
 				k3[0]--;
 		}
 	}
-	if (!ReadKEY2){
+	if (!ReadKEY2) {
 		k3[0]--;
 		k3[1]--;
-		if (k3[1]==-1){
-			k3[1]=0;
-			if (k3[0]==-1)
+		if (k3[1] == -1) {
+			k3[1] = 0;
+			if (k3[0] == -1)
 				k3[0]++;
 		}
 	}
-	if (!ReadKEY3){
-		oled_mode=1;
+	if (!ReadKEY3) {
+		oled_mode = 1;
 		return;
 	}
 }
 
 //void* sel[selNUM]={&bian,&Kp,&Ki,&Kd};
 
-void oled_sel1(void){
+void oled_sel1(void) {
 //	OLED_ShowNumNoLen(6,6,(int32_t)*sel[k3[0]],12,1);
-	if (!ReadKEY4){
-		oled_mode=0;
+	if (!ReadKEY4) {
+		oled_mode = 0;
 		return;
 	}
 }
 
 void OLED_loop(void) {
-	if (oled_mode==0)
+	if (oled_mode == 0)
 		oled_sel0();
 	else
 		oled_sel1();
 
 	/***************************/
-	b01=1-b01;
+	b01 = 1 - b01;
 	OLED_Refresh();
 	OLED_ClearRF();
 }
