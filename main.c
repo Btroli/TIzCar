@@ -14,7 +14,6 @@ int main(void) {
 	SYSCFG_DL_init();
 
 	OLED_SET();
-	OLED_DisplayTurn(1);
 
 	Motor_init();
 	encoder_init();
@@ -48,11 +47,11 @@ void loop(void) {
 int8_t bz_mode = 0, bz_turn;
 volatile int16_t bz_time = 0;
 typedef enum {
-	BZ_IDLE = 0,    // 正常循迹
-	BZ_LEFT,        // 左转
-	BZ_FWD,         // 向前开
-	BZ_RIGHT,       // 右转
-	BZ_FWD2         // 向右转后向前开，等待碰线
+	BZ_IDLE = 0,	// 正常循迹
+	BZ_LEFT,		// 左转
+	BZ_FWD,			// 向前开
+	BZ_RIGHT,		// 右转
+	BZ_FWD2			// 向右转后向前开，等待碰线
 } BZ_State;
 volatile BZ_State bz_state = BZ_IDLE;
 
@@ -325,16 +324,28 @@ void oled_sel1(void) {
 	}
 }
 
-void OLED_loop(void) {
-	if (oled_mode == 0)
-		oled_sel0();
-	else
-		oled_sel1();
+// void OLED_loop(void) {
+// 	if (oled_mode == 0)
+// 		oled_sel0();
+// 	else
+// 		oled_sel1();
 
-	/***************************/
-	b01 = 1 - b01;
-	OLED_Refresh();
-	OLED_ClearRF();
+// 	/***************************/
+// 	b01 = 1 - b01;
+// 	OLED_Refresh();
+// 	OLED_ClearRF();
+// }
+
+void OLED_loop(void) {
+
+	if(LoopMode==Loop_CHOICE)
+		;
+
+	if (LoopMode == Loop_SCREEN0)
+		loop_screen0();
+	if (LoopMode == Loop_SCREEN1)
+		loop_screen1();
+
 }
 
 /*

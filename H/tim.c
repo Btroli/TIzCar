@@ -74,25 +74,26 @@ void TIMER_10ms_INST_IRQHandler(void) {
 void TIMER_20ms_INST_IRQHandler(void) {
 	if ( DL_TimerG_getPendingInterrupt(TIMER_20ms_INST) == DL_TIMER_IIDX_ZERO ) {
 		encoder_update();
-		LS_update;
+		LS_update;                   //八路灰度传感器检测
 	}
 }
 #endif
 
 #if TIM_OLED
 void TIMER_OLED_INST_IRQHandler(void) {
-	if ( DL_TimerG_getPendingInterrupt(TIMER_OLED_INST) == DL_TIMER_IIDX_ZERO ) {
-		OLED_loop();
-		if (capture_done == 1)
-			CSB;
-	}
+	if ( DL_TimerG_getPendingInterrupt(TIMER_OLED_INST) == DL_TIMER_IIDX_ZERO )
+
+			OLED_loop();
+
 }
 #endif
 
 #if TIM_LOOP
 void PIDloop_INST_IRQHandler(void) {
 	if ( DL_TimerG_getPendingInterrupt(PIDloop_INST) == DL_TIMER_IIDX_ZERO ) {
-		loop();
+		if(LoopMode==Loop_CHOICE)loop();
+		
+		else{Motor_Stop(0);}
 	}
 }
 #endif

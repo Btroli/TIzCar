@@ -25,6 +25,7 @@
 #include "encoder.h"
 #include "tim.h"
 #include "ultrasound.h"
+#include "menuhz.h"
 
 
 #define ReadKEY1 (DL_GPIO_readPins(KEY_PORT, KEY_KEY1_PIN)&KEY_KEY1_PIN)    //接GND值=0
