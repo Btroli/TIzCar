@@ -1,6 +1,5 @@
 #include "menuhz.h"
 
-
 #define value_len 10
 #define option_NUM 10
 int value_num = 0;
@@ -8,34 +7,42 @@ int option = 0;
 int count = 1;
 int area = 0;
 volatile int LoopMode = 0;
-		//int LoopMode=0;
 
+void cal_valueP(uint8_t *p, float *v) {
+	static const float pow10[10] = {
+		1e-9f, 1e-8f, 1e-7f, 1e-6f, 1e-5f, 1e-4f, 1e-3f, 1e-2f, 1e-1f, 1e0f
+	};
+	*v = 0;
+	for (uint8_t i = 0; i < 9; ++i)
+		*v = *v * 10 + *(p++);
+	*v *= pow10[*p];
+}
 
-
-uint8_t name[10][10] = {
-	"LKp",		//0
-	"LKi",		//1
-	"LKd",		//2
-	"GAB",		//3
-	"quan",		//4
-	"BiZhang",		//5
+char name[10][10] = {
+	"pid1",		//0
+	"quan",		//1
+	"bz",		//2
+	"name3",		//3
+	"name4",		//4
+	"name5",		//5
 	"name6",		//6
 	"name7",		//7
 	"name8",		//8
-	"distance",		//9
+	"name9",		//9
 };
 uint8_t value[10][value_len] = {
-	{0, 3, 8, 0, 0, 0, 0, 0, 0, 3},		//0
-	{0, 0, 0, 0, 6, 0, 0, 0, 0, 3},		//1
-	{0, 6, 6, 0, 0, 0, 0, 0, 0, 3},		//2
-	{3, 0, 0, 0, 0, 0, 0, 0, 0, 2},		//3
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 3},		//4
-	{0, 1, 0, 0, 0, 0, 0, 0, 0, 2},		//5
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 1},		//0
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 1},		//1
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 1},		//2
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 5},		//3
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 5},		//4
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 5},		//5
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 5},		//6
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 5},		//7
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 5},		//8
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 5},		//9
 };
+
 void loop_screen0(void) {		//主菜单，模式选择
 	OLED_ShowString(6, 12 + 18 * 0, name[option - area + 0], 12, 1);
 	OLED_ShowString(6, 12 + 18 * 1, name[option - area + 1], 12, 1);
@@ -80,6 +87,7 @@ void loop_screen0(void) {		//主菜单，模式选择
 
 	delay_ms(200);
 }
+
 void loop_screen1(void) {
 	if (KEY_Scan1()) {
 		value_num++;
@@ -106,7 +114,7 @@ void loop_screen1(void) {
 	OLED_ShowString(6, 12, name[option], 12, 1);
 
 	OLED_Refresh();
-	OLED_Clear();
+	OLED_ClearRF();
 
 	if (KEY_Scan3()) {
 		LoopMode = Loop_CHOICE;
@@ -124,9 +132,6 @@ void loop_screen1(void) {
 	delay_ms(200);
 }
 
-
-
-
 void FuXuan(uint8_t n) {
 	if (n < 3) {
 		OLED_DrawBoxXuLine(0, 8 + 18 * n, 127, 26 + 18 * n, 3, 1);
@@ -139,9 +144,6 @@ void FuXuan(uint8_t n) {
 		OLED_DrawBoxXuLine(2, 10 + 18 * n, 125, 24 + 18 * n, 3, 0);
 	}
 }
-
-
-
 
 uint8_t	KEY_Scan1() {
 	if (DL_GPIO_readPins(KEY_PORT, KEY_KEY1_PIN) == key_pressure) {			//检测按键是否被按下
@@ -183,5 +185,4 @@ uint8_t	KEY_Scan4() {
 	}
 	return 0;
 }
-
 

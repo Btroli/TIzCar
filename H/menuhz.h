@@ -11,6 +11,9 @@
 #define Loop_CHOICE     2
 
 extern volatile int LoopMode;
+extern uint8_t value[10][10];
+
+void cal_valueP(uint8_t *p, float *v);
 
 
 void loop_screen0(void);
